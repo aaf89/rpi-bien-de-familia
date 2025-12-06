@@ -32,7 +32,6 @@ public class Ciudad {
 	
 	@ManyToOne
 	@JoinColumn(name= "id_departamento")
-	@Column(nullable = false)
 	private Departamento departamento;
 
 }

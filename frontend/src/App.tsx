@@ -11,6 +11,11 @@ import InmueblesPage from "./pages/InmueblesPage";
 import PersonasPage from "./pages/PersonasPage";
 import CiudadesPage from "./pages/CiudadesPage";
 import DepartamentosPage from "./pages/DepartamentosPage";
+import ActosInmueblesPage from "./pages/ActosInmueblesPage";
+import ActosPersonasPage from "./pages/ActosPersonasPage";
+import ActosRegistralesPage from "./pages/ActosRegistralesPage";
+import PersonasInmueblesPage from "./pages/PersonasInmuebles";
+import TiposParticipacionesPage from "./pages/TiposParticipacionesPage";
 
 const { Header, Content, Sider, Footer } = Layout;
 
@@ -42,16 +47,26 @@ function App() {
   };
 
   const renderContent = () => {
-    switch (selectedKey) {
-      case "personas":
-        return <PersonasPage />;
-      case "ciudades":
-        return <CiudadesPage />;
-      case "departamentos":
-        return <DepartamentosPage />;
-      case "inmuebles":
-      default:
-        return <InmueblesPage />;
+	switch (selectedKey) {
+		case "personas":
+        	return <PersonasPage />;
+		case "ciudades":
+	        return <CiudadesPage />;
+		case "departamentos":
+	        return <DepartamentosPage />;
+		case "actosRegistrales":
+		  	return <ActosRegistralesPage />;
+		case "tiposParticipaciones":
+			return <TiposParticipacionesPage />;
+		case "actosInmuebles":
+			return <ActosInmueblesPage />;
+		case "actosPersonas":
+		  	return <ActosPersonasPage />;
+		case "personasInmuebles":
+			return <PersonasInmueblesPage />;
+		case "inmuebles":
+			default:
+		  		return <InmueblesPage />;
     }
   };
 
@@ -85,6 +100,11 @@ function App() {
             { key: "personas", icon: <TeamOutlined />, label: "Personas" },
             { key: "ciudades", icon: <EnvironmentOutlined />, label: "Ciudades" },
             { key: "departamentos", icon: <ApartmentOutlined />, label: "Departamentos" },
+			{ key: "actosRegistrales", icon: <ApartmentOutlined />, label: "ActosRegistrales" },
+			{ key: "tiposParticipaciones", icon: <ApartmentOutlined />, label: "TiposParticipacion" },
+			{ key: "actosInmuebles", icon: <ApartmentOutlined />, label: "ActosInmuebles" },
+			{ key: "actosPersonas", icon: <ApartmentOutlined />, label: "ActosPersonas" },
+			{ key: "personasInmuebles", icon: <ApartmentOutlined />, label: "PersonasInmuebles" },
           ]}
         />
       </Sider>
