@@ -18,7 +18,7 @@ import com.rpi_bien_de_familia.Entity.TipoParticipacion;
 import com.rpi_bien_de_familia.Service.TipoParticipacionService;
 
 @RestController
-@RequestMapping("/api/tipos-participacion")
+@RequestMapping("/api/tipos-participaciones")
 @CrossOrigin(origins = "http://localhost:5173")
 public class TipoParticipacionController {
 

@@ -38,7 +38,7 @@ interface ActoPersona {
 const API = "http://localhost:8080/api/actos-personas";
 const API_AI = "http://localhost:8080/api/actos-inmuebles";
 const API_PERSONAS = "http://localhost:8080/api/personas";
-const API_TIPOS = "http://localhost:8080/api/tipos-participacion";
+const API_TIPOS = "http://localhost:8080/api/tipos-participaciones";
 
 const ActosPersonasPage = () => {
   const [items, setItems] = useState<ActoPersona[]>([]);

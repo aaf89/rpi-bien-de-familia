@@ -16,9 +16,9 @@ interface TipoParticipacion {
   descripcion: string;
 }
 
-const API_URL = "http://localhost:8080/api/tipos-participacion";
+const API_URL = "http://localhost:8080/api/tipos-participaciones";
 
-const TiposParticipacionPage = () => {
+const TiposParticipacionesPage = () => {
   const [items, setItems] = useState<TipoParticipacion[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -130,4 +130,4 @@ const TiposParticipacionPage = () => {
   );
 };
 
-export default TiposParticipacionPage;
+export default TiposParticipacionesPage;
