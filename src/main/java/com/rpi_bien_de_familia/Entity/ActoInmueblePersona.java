@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "actos_personas")
+@Table(name = "actos_inmuebles_personas")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class ActoPersona {
+public class ActoInmueblePersona {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

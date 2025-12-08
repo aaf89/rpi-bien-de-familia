@@ -8,49 +8,71 @@ import {
   message,
   Space,
   Popconfirm,
+  Select,
 } from "antd";
 import axios from "axios";
 
-interface Inmueble {
+interface InmueblesPageProps {
+  onVerTitulares?: (id: number) => void;
+}
+
+interface Persona {
+  id: number;
+  apellido: string;
+  nombre: string;
+}
+
+interface InmuebleDTO {
   id: number;
   matricula: string;
   nomenclaturaCatastral: string;
+  cantTitulares: number;
 }
 
-const InmueblesPage = () => {
-  const [inmuebles, setInmuebles] = useState<Inmueble[]>([]);
+const InmueblesPage: React.FC<InmueblesPageProps> = ({ onVerTitulares }) => {
+  const [inmuebles, setInmuebles] = useState<InmuebleDTO[]>([]);
+  const [personas, setPersonas] = useState<Persona[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [editingInmueble, setEditingInmueble] = useState<Inmueble | null>(null);
+  const [editingInmueble, setEditingInmueble] = useState<InmuebleDTO | null>(null);
   const [form] = Form.useForm();
-
+  
   const cargarInmuebles = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<Inmueble[]>(
-        "http://localhost:8080/api/inmuebles"
-      );
+	  const res = await axios.get<InmuebleDTO[]>(
+	    "http://localhost:8080/api/inmuebles"
+	  );
       setInmuebles(res.data);
     } catch (e) {
-      message.error("Error al cargar inmuebles");
+      message.error("Error al cargar inmuebles" + e);
     } finally {
       setLoading(false);
     }
   };
 
+  const cargarPersonas = async () => {
+    try {
+      const res = await axios.get<Persona[]>("http://localhost:8080/api/personas");
+      setPersonas(res.data);
+    } catch {
+      message.error("Error al cargar personas");
+    }
+  };
+  
+  
   useEffect(() => {
     cargarInmuebles();
+	cargarPersonas();
   }, []);
 
-  // Abrir modal para NUEVO
   const abrirModalNuevo = () => {
     setEditingInmueble(null);
     form.resetFields();
     setOpenModal(true);
   };
 
-  // Abrir modal para EDITAR
-  const abrirModalEditar = (inmueble: Inmueble) => {
+  const abrirModalEditar = (inmueble: InmuebleDTO) => {
     setEditingInmueble(inmueble);
     form.setFieldsValue({
       matricula: inmueble.matricula,
@@ -59,24 +81,25 @@ const InmueblesPage = () => {
     setOpenModal(true);
   };
 
-  // Guardar (crear o editar según corresponda)
   const onGuardar = async () => {
     try {
       const values = await form.validateFields();
+      const { matricula, nomenclaturaCatastral, personaId } = values;
 
       if (editingInmueble) {
-        // EDITAR
+        // EDITAR inmueble: acá NO toco titulares
         await axios.put(
           `http://localhost:8080/api/inmuebles/${editingInmueble.id}`,
-          {
-            ...editingInmueble,
-            ...values,
-          }
+          { matricula, nomenclaturaCatastral }
         );
         message.success("Inmueble actualizado correctamente");
       } else {
-        // CREAR
-        await axios.post("http://localhost:8080/api/inmuebles", values);
+        // CREAR: mando también personaId para que el back cree la titularidad
+        await axios.post("http://localhost:8080/api/inmuebles", {
+          matricula,
+          nomenclaturaCatastral,
+          personaId,
+        });
         message.success("Inmueble creado correctamente");
       }
 
@@ -85,14 +108,20 @@ const InmueblesPage = () => {
       setEditingInmueble(null);
       cargarInmuebles();
     } catch (e) {
-      // si falla la validación de form, no mostramos error extra
-      if (!(e as any).errorFields) {
-        message.error("No se pudo guardar el inmueble");
-      }
+		if (e?.errorFields) return; // error de validación del form, no mostramos mensaje extra
+
+		  console.error("Error al guardar inmueble", e);
+
+		  const backendMessage =
+		    e?.response?.data?.message || // por si algún día devolvés {message: "..."}
+		    e?.response?.data?.error ||   // en tu caso Spring manda "error": "Internal Server Error"
+		    e?.message;                   // mensaje genérico de axios
+
+		  message.error(backendMessage || "No se pudo guardar el inmueble");
     }
   };
 
-  // Eliminar
+  
   const onEliminar = async (inmueble: Inmueble) => {
     try {
       await axios.delete(
@@ -101,7 +130,16 @@ const InmueblesPage = () => {
       message.success("Inmueble eliminado");
       cargarInmuebles();
     } catch (e) {
-      message.error("No se pudo eliminar el inmueble");
+		if (e?.errorFields) return; // error de validación del form, no mostramos mensaje extra
+
+				  console.error("Error al guardar inmueble", e);
+
+				  const backendMessage =
+				    e?.response?.data?.message || // por si algún día devolvés {message: "..."}
+				    e?.response?.data?.error ||   // en tu caso Spring manda "error": "Internal Server Error"
+				    e?.message;                   // mensaje genérico de axios
+
+				  message.error(backendMessage || "No se pudo guardar el inmueble");
     }
   };
 
@@ -118,13 +156,23 @@ const InmueblesPage = () => {
       </Button>
 
       <Table rowKey="id" dataSource={inmuebles} loading={loading}>
-        <Table.Column<Inmueble> title="ID" dataIndex="id" />
-        <Table.Column<Inmueble> title="Matrícula" dataIndex="matricula" />
-        <Table.Column<Inmueble>
-          title="Nomenclatura"
-          dataIndex="nomenclaturaCatastral"
-        />
-        <Table.Column<Inmueble>
+        <Table.Column<InmuebleDTO> title="ID" dataIndex="id" />
+        <Table.Column<InmuebleDTO> title="Matrícula" dataIndex="matricula" />
+        <Table.Column<InmuebleDTO> title="Nomenclatura" dataIndex="nomenclaturaCatastral"/>
+
+		<Table.Column<InmuebleDTO>
+		  title="Titulares"
+		  render={(_, record) => (
+		    <Button
+		      size="small"
+		      onClick={() => onVerTitulares && onVerTitulares(record.id)}
+		    >
+				{`Ver Titulares (${record.cantTitulares ?? 0})`}
+		    </Button>
+		  )}
+		/>
+
+        <Table.Column<InmuebleDTO>
           title="Acciones"
           key="acciones"
           render={(_, record) => (
@@ -169,15 +217,41 @@ const InmueblesPage = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="Nomenclatura catastral"
-            name="nomenclaturaCatastral"
-            rules={[
-              { required: true, message: "La nomenclatura es obligatoria" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+		  <Form.Item
+		    label="Nomenclatura catastral"
+		    name="nomenclaturaCatastral"
+		    rules={[
+		      { required: true, message: "La nomenclatura es obligatoria" },
+		      {
+		        pattern: /^\d{4}-\d{4}-\d{4}-\d{4}-\d{4}$/,
+		        message: "Formato inválido. Debe ser XXXX-XXXX-XXXX-XXXX-XXXX",
+		      },
+		    ]}
+		  >
+		    <Input placeholder="Ej: 1234-5678-9012-3456-7890" />
+		  </Form.Item>
+		  
+		  {!editingInmueble && (
+			<Form.Item
+			    label="Persona"
+			    name="personaId"
+			    rules={[]}
+			  >
+			    <Select
+			      placeholder="Seleccione una persona (opcional)"
+			      allowClear
+			    >
+			      <Select.Option value={null}>— Sin titular —</Select.Option>
+
+			      {personas.map((p) => (
+			        <Select.Option key={p.id} value={p.id}>
+			          {p.apellido}, {p.nombre}
+			        </Select.Option>
+			      ))}
+			    </Select>
+			  </Form.Item>
+		  )}
+		  
         </Form>
       </Modal>
     </div>

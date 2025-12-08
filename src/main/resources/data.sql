@@ -1,6 +1,26 @@
 -- Script de carga inicial para RPI - Bien de Familia
 -- Ejecutado automáticamente por Spring Boot
 
+-- 1) Renombrar la tabla rota
+ALTER TABLE personas_inmuebles RENAME TO personas_inmuebles_old;
+
+-- 2) Crear la tabla nueva, BIEN definida
+CREATE TABLE personas_inmuebles (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    persona_id   BIGINT  NOT NULL,
+    inmueble_id  BIGINT  NOT NULL,
+    numerador    INTEGER NOT NULL,
+    denominador  INTEGER NOT NULL
+);
+
+-- 3) (Opcional) copiar los datos viejos si querés conservarlos
+INSERT INTO personas_inmuebles (persona_id, inmueble_id, numerador, denominador)
+SELECT persona_id, inmueble_id, numerador, denominador
+FROM personas_inmuebles_old;
+
+-- 4) Borrar la tabla vieja
+DROP TABLE personas_inmuebles_old;
+
 INSERT INTO departamentos (id, codigo, descripcion) VALUES (1, '58035', 'Confluencia');
 INSERT INTO departamentos (id, codigo, descripcion) VALUES (2, '58999', 'Sin declarar');
 INSERT INTO departamentos (id, codigo, descripcion) VALUES (3, '58998', 'Indeterminado');

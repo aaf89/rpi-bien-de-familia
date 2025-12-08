@@ -14,28 +14,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rpi_bien_de_familia.Entity.ActoPersona;
-import com.rpi_bien_de_familia.Service.ActoPersonaService;
+import com.rpi_bien_de_familia.Entity.ActoInmueblePersona;
+import com.rpi_bien_de_familia.Service.ActoInmueblePersonaService;
 
 @RestController
-@RequestMapping("/api/actos-personas")
+@RequestMapping("/api/actos-inmuebles-personas")
 @CrossOrigin(origins = "http://localhost:5173")
-public class ActoPersonaController {
+public class ActoInmueblePersonaController {
 
-    private final ActoPersonaService actoPersonaService;
+    private final ActoInmueblePersonaService actoInmueblePersonaService;
 
-    public ActoPersonaController(ActoPersonaService actoPersonaService) {
-        this.actoPersonaService = actoPersonaService;
+    public ActoInmueblePersonaController(ActoInmueblePersonaService actoInmueblePersonaService) {
+        this.actoInmueblePersonaService = actoInmueblePersonaService;
     }
 
     @GetMapping
-    public List<ActoPersona> listar() {
-        return actoPersonaService.listar();
+    public List<ActoInmueblePersona> listar() {
+        return actoInmueblePersonaService.listar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActoPersona> obtener(@PathVariable Long id) {
-        ActoPersona ap = actoPersonaService.buscarPorId(id);
+    public ResponseEntity<ActoInmueblePersona> obtener(@PathVariable Long id) {
+        ActoInmueblePersona ap = actoInmueblePersonaService.buscarPorId(id);
         if (ap == null) {
             return ResponseEntity.notFound().build();
         }
@@ -43,16 +43,16 @@ public class ActoPersonaController {
     }
 
     @PostMapping
-    public ResponseEntity<ActoPersona> crear(@RequestBody ActoPersona actoPersona) {
-        actoPersona.setId(null);
-        ActoPersona nuevo = actoPersonaService.guardar(actoPersona);
+    public ResponseEntity<ActoInmueblePersona> crear(@RequestBody ActoInmueblePersona actoInmueblePersona) {
+    	actoInmueblePersona.setId(null);
+    	ActoInmueblePersona nuevo = actoInmueblePersonaService.guardar(actoInmueblePersona);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ActoPersona> actualizar(@PathVariable Long id,
-                                                  @RequestBody ActoPersona datos) {
-        ActoPersona existente = actoPersonaService.buscarPorId(id);
+    public ResponseEntity<ActoInmueblePersona> actualizar(@PathVariable Long id,
+                                                  @RequestBody ActoInmueblePersona datos) {
+    	ActoInmueblePersona existente = actoInmueblePersonaService.buscarPorId(id);
         if (existente == null) {
             return ResponseEntity.notFound().build();
         }
@@ -61,13 +61,13 @@ public class ActoPersonaController {
         existente.setPersona(datos.getPersona());
         existente.setTipoParticipacion(datos.getTipoParticipacion());
 
-        ActoPersona actualizado = actoPersonaService.guardar(existente);
+        ActoInmueblePersona actualizado = actoInmueblePersonaService.guardar(existente);
         return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        actoPersonaService.eliminar(id);
+    	actoInmueblePersonaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

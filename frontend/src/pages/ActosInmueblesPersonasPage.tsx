@@ -28,25 +28,25 @@ interface ActoInmueble {
   inmueble: { matricula: string };
 }
 
-interface ActoPersona {
+interface ActoInmueblePersona {
   id: number;
   actoInmueble: ActoInmueble;
   persona: Persona;
   tipoParticipacion: TipoParticipacion;
 }
 
-const API = "http://localhost:8080/api/actos-personas";
+const API = "http://localhost:8080/api/actos-inmuebles-personas";
 const API_AI = "http://localhost:8080/api/actos-inmuebles";
 const API_PERSONAS = "http://localhost:8080/api/personas";
 const API_TIPOS = "http://localhost:8080/api/tipos-participaciones";
 
-const ActosPersonasPage = () => {
-  const [items, setItems] = useState<ActoPersona[]>([]);
+const ActosInmueblesPersonasPage = () => {
+  const [items, setItems] = useState<ActoInmueblePersona[]>([]);
   const [actosInmuebles, setActosInmuebles] = useState<ActoInmueble[]>([]);
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [tipos, setTipos] = useState<TipoParticipacion[]>([]);
   const [openModal, setOpenModal] = useState(false);
-  const [editing, setEditing] = useState<ActoPersona | null>(null);
+  const [editing, setEditing] = useState<ActoInmueblePersona | null>(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -81,7 +81,7 @@ const ActosPersonasPage = () => {
     setOpenModal(true);
   };
 
-  const abrirEditar = (item: ActoPersona) => {
+  const abrirEditar = (item: ActoInmueblePersona) => {
     setEditing(item);
     form.setFieldsValue({
       actoInmuebleId: item.actoInmueble.id,
@@ -115,7 +115,7 @@ const ActosPersonasPage = () => {
     }
   };
 
-  const eliminar = async (item: ActoPersona) => {
+  const eliminar = async (item: ActoInmueblePersona) => {
     try {
       await axios.delete(`${API}/${item.id}`);
       message.success("Eliminado");
@@ -208,4 +208,4 @@ const ActosPersonasPage = () => {
   );
 };
 
-export default ActosPersonasPage;
+export default ActosInmueblesPersonasPage;

@@ -12,18 +12,28 @@ import PersonasPage from "./pages/PersonasPage";
 import CiudadesPage from "./pages/CiudadesPage";
 import DepartamentosPage from "./pages/DepartamentosPage";
 import ActosInmueblesPage from "./pages/ActosInmueblesPage";
-import ActosPersonasPage from "./pages/ActosPersonasPage";
+import ActosPersonasPage from "./pages/ActosInmueblesPersonasPage";
 import ActosRegistralesPage from "./pages/ActosRegistralesPage";
-import PersonasInmueblesPage from "./pages/PersonasInmuebles";
+import PersonasInmueblesPage from "./pages/PersonasInmueblesPage";
 import TiposParticipacionesPage from "./pages/TiposParticipacionesPage";
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type MenuKey = "inmuebles" | "personas" | "ciudades" | "departamentos";
+type MenuKey =
+  | "inmuebles"
+  | "personas"
+  | "ciudades"
+  | "departamentos"
+  | "actosRegistrales"
+  | "tiposParticipaciones"
+  | "personasInmuebles"
+  | "actosInmuebles"
+  | "actosPersonas";
 
 function App() {
   // Estado inicial por defecto
   const [selectedKey, setSelectedKey] = useState<MenuKey>("inmuebles");
+  const [filtroInmuebleId, setFiltroInmuebleId] = useState<number | null>(null);
 
   // Al montar, intento leer lo último que guardé en localStorage
   useEffect(() => {
@@ -63,19 +73,25 @@ function App() {
 		case "actosPersonas":
 		  	return <ActosPersonasPage />;
 		case "personasInmuebles":
-			return <PersonasInmueblesPage />;
+		  return <PersonasInmueblesPage filtroInmuebleId={filtroInmuebleId} />;
 		case "inmuebles":
-			default:
-		  		return <InmueblesPage />;
+			  return (
+			    <InmueblesPage
+			      onVerTitulares={(id) => {
+			        setFiltroInmuebleId(id);
+			        setSelectedKey("personasInmuebles");
+			      }}
+			    />
+			  );
     }
   };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider breakpoint="lg" collapsedWidth="0">
+      <Sider breakpoint="lg" collapsedWidth="0" width="230">
         <div
           style={{
-            height: 64,
+            height: 100,
             margin: 16,
             display: "flex",
             alignItems: "center",
@@ -89,7 +105,6 @@ function App() {
         >
           RPI
         </div>
-
         <Menu
           theme="dark"
           mode="inline"
@@ -98,13 +113,37 @@ function App() {
           items={[
             { key: "inmuebles", icon: <HomeOutlined />, label: "Inmuebles" },
             { key: "personas", icon: <TeamOutlined />, label: "Personas" },
-            { key: "ciudades", icon: <EnvironmentOutlined />, label: "Ciudades" },
-            { key: "departamentos", icon: <ApartmentOutlined />, label: "Departamentos" },
-			{ key: "actosRegistrales", icon: <ApartmentOutlined />, label: "ActosRegistrales" },
-			{ key: "tiposParticipaciones", icon: <ApartmentOutlined />, label: "TiposParticipacion" },
-			{ key: "actosInmuebles", icon: <ApartmentOutlined />, label: "ActosInmuebles" },
-			{ key: "actosPersonas", icon: <ApartmentOutlined />, label: "ActosPersonas" },
-			{ key: "personasInmuebles", icon: <ApartmentOutlined />, label: "PersonasInmuebles" },
+			{
+			      key: "separator-1",
+			      disabled: true,
+			      label: (
+			        <div
+			          style={{
+			            borderTop: "1px solid rgba(255, 255, 255, 0.2)",
+			            margin: "8px 0",
+			          }}
+			        />
+			      ),
+			    },            { key: "departamentos", icon: <ApartmentOutlined />, label: "Departamentos" },
+			{ key: "ciudades", icon: <EnvironmentOutlined />, label: "Ciudades" },
+			{ key: "actosRegistrales", icon: <ApartmentOutlined />, label: "Actos Registrales" },
+			{ key: "tiposParticipaciones", icon: <ApartmentOutlined />, label: "Tipos de Participacion" },
+			{
+				key: "separator-2",
+				disabled: true,
+				label: (
+					<div
+					    style={{
+					    borderTop: "1px solid rgba(255, 255, 255, 0.2)",
+					    margin: "8px 0",
+					    }}
+					/>
+				),
+			},
+			{ key: "personasInmuebles", icon: <ApartmentOutlined />, label: "Personas Inmuebles" },
+			{ key: "actosInmuebles", icon: <ApartmentOutlined />, label: "Actos Inmuebles" },
+			{ key: "actosPersonas", icon: <ApartmentOutlined />, label: "Actos Personas" },
+
           ]}
         />
       </Sider>

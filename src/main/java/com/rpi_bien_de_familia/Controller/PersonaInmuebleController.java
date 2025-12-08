@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rpi_bien_de_familia.Entity.PersonaInmueble;
 import com.rpi_bien_de_familia.Service.PersonaInmuebleService;
 
+import tools.jackson.databind.ObjectMapper;
+
 @RestController
 @RequestMapping("/api/personas-inmuebles")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -30,7 +32,9 @@ public class PersonaInmuebleController {
 
     @GetMapping
     public List<PersonaInmueble> listar() {
-        return personaInmuebleService.listar();
+        List<PersonaInmueble> lista = personaInmuebleService.listar();
+        System.out.println("LISTA EN CONTROLLER = " + lista);
+        return lista;
     }
 
     @GetMapping("/{id}")
@@ -44,7 +48,18 @@ public class PersonaInmuebleController {
 
     @PostMapping
     public ResponseEntity<PersonaInmueble> crear(@RequestBody PersonaInmueble personaInmueble) {
+    	/*try {
+            ObjectMapper mapper = new ObjectMapper();
+            System.out.println("\n\n=== DD DEBUG PERSONA_INMUEBLE ===");
+            System.out.println(mapper.writeValueAsString(personaInmueble));
+            System.out.println("=================================\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        throw new RuntimeException("CORTADO ADREDE POR DD");*/
         personaInmueble.setId(null);
+        
         PersonaInmueble nuevo = personaInmuebleService.guardar(personaInmueble);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }

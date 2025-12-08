@@ -28,11 +28,11 @@ public class PersonaInmueble {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_persona", nullable = false)
+    @JoinColumn(name = "persona_id", nullable = false)
     private Persona persona;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_inmueble", nullable = false)
+    @JoinColumn(name = "inmueble_id", nullable = false)
     private Inmueble inmueble;
 
     @Column(nullable = false)

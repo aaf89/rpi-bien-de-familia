@@ -86,7 +86,7 @@ const ActosInmueblesPage = () => {
       fechaDesde: item.fechaDesde ? dayjs(item.fechaDesde) : null,
       fechaHasta: item.fechaHasta ? dayjs(item.fechaHasta) : null,
       juzgado: item.juzgado,
-      expediente: item.expediente,
+      numeroExpediente: item.expediente,
       libro: item.libro,
       tomo: item.tomo,
       folio: item.folio,
@@ -104,7 +104,7 @@ const ActosInmueblesPage = () => {
         fechaDesde: v.fechaDesde ? v.fechaDesde.format("YYYY-MM-DD") : null,
         fechaHasta: v.fechaHasta ? v.fechaHasta.format("YYYY-MM-DD") : null,
         juzgado: v.juzgado,
-        expediente: v.expediente,
+        numeroExpediente: v.expediente,
         libro: v.libro,
         tomo: v.tomo,
         folio: v.folio,
@@ -149,6 +149,11 @@ const ActosInmueblesPage = () => {
         <Table.Column title="Desde" dataIndex="fechaDesde" />
         <Table.Column title="Hasta" dataIndex="fechaHasta" />
         <Table.Column title="Juzgado" dataIndex="juzgado" />
+		<Table.Column title="Expediente" dataIndex="numeroExpediente" />
+		<Table.Column title="Libro" dataIndex="libro" />
+		<Table.Column title="Tomo" dataIndex="tomo" />
+		<Table.Column title="Folio" dataIndex="folio" />
+
         <Table.Column
           title="Acciones"
           render={(_, record) => (
