@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor @AllArgsConstructor
 public class ActoInmueblePersona {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,11 +27,7 @@ public class ActoInmueblePersona {
     private ActoInmueble actoInmueble;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_persona", nullable = false)
-    private Persona persona;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_tipo_participacion", nullable = false)
-    private TipoParticipacion tipoParticipacion;
+    @JoinColumn(name = "id_persona_inmueble", nullable = false)
+    private PersonaInmueble personaInmueble;
 }
 

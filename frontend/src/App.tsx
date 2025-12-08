@@ -12,7 +12,7 @@ import PersonasPage from "./pages/PersonasPage";
 import CiudadesPage from "./pages/CiudadesPage";
 import DepartamentosPage from "./pages/DepartamentosPage";
 import ActosInmueblesPage from "./pages/ActosInmueblesPage";
-import ActosPersonasPage from "./pages/ActosInmueblesPersonasPage";
+import ActosInmueblesPersonasPage from "./pages/ActosInmueblesPersonasPage";
 import ActosRegistralesPage from "./pages/ActosRegistralesPage";
 import PersonasInmueblesPage from "./pages/PersonasInmueblesPage";
 import TiposParticipacionesPage from "./pages/TiposParticipacionesPage";
@@ -28,7 +28,7 @@ type MenuKey =
   | "tiposParticipaciones"
   | "personasInmuebles"
   | "actosInmuebles"
-  | "actosPersonas";
+  | "actosInmueblesPersonas";
 
 function App() {
   // Estado inicial por defecto
@@ -70,10 +70,18 @@ function App() {
 			return <TiposParticipacionesPage />;
 		case "actosInmuebles":
 			return <ActosInmueblesPage />;
-		case "actosPersonas":
-		  	return <ActosPersonasPage />;
+		case "actosInmueblesPersonas":
+		  	return <ActosInmueblesPersonasPage />;
 		case "personasInmuebles":
-		  return <PersonasInmueblesPage filtroInmuebleId={filtroInmuebleId} />;
+			      return (
+			        <PersonasInmueblesPage
+			          filtroInmuebleId={filtroInmuebleId}
+			          onVolver={() => {
+			            setFiltroInmuebleId(null);   // limpiamos el filtro
+			            setSelectedKey("inmuebles"); // volvemos a la pantalla de Inmuebles
+			          }}
+			        />
+			      );
 		case "inmuebles":
 			  return (
 			    <InmueblesPage
@@ -142,7 +150,7 @@ function App() {
 			},
 			{ key: "personasInmuebles", icon: <ApartmentOutlined />, label: "Personas Inmuebles" },
 			{ key: "actosInmuebles", icon: <ApartmentOutlined />, label: "Actos Inmuebles" },
-			{ key: "actosPersonas", icon: <ApartmentOutlined />, label: "Actos Personas" },
+			{ key: "actosInmueblesPersonas", icon: <ApartmentOutlined />, label: "Actos Inmuebles Personas" },
 
           ]}
         />

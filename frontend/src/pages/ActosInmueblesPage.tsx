@@ -10,6 +10,8 @@ import {
   Popconfirm,
   DatePicker,
   Select,
+  Row,
+  Col,
 } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -19,15 +21,17 @@ interface ActoRegistral {
   descripcion: string;
 }
 
-interface Inmueble {
+interface InmuebleDTO {
   id: number;
   matricula: string;
+  nomenclaturaCatastral: string;
+  cantTitulares: number;
 }
 
 interface ActoInmueble {
   id: number;
   actoRegistral: ActoRegistral;
-  inmueble: Inmueble;
+  inmueble: InmuebleDTO;
   fechaDesde: string | null;
   fechaHasta: string | null;
   juzgado: string | null;
@@ -44,7 +48,7 @@ const API_INMUEBLES = "http://localhost:8080/api/inmuebles";
 const ActosInmueblesPage = () => {
   const [items, setItems] = useState<ActoInmueble[]>([]);
   const [actos, setActos] = useState<ActoRegistral[]>([]);
-  const [inmuebles, setInmuebles] = useState<Inmueble[]>([]);
+  const [inmuebles, setInmuebles] = useState<InmuebleDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editing, setEditing] = useState<ActoInmueble | null>(null);
@@ -120,9 +124,25 @@ const ActosInmueblesPage = () => {
 
       setOpenModal(false);
       cargar();
-    } catch {
-      message.error("No se pudo guardar");
-    }
+	  } catch (e: any) {
+	    console.error(e); // opcional, para ver bien qué viene del backend
+
+	    let msg = "No se pudo guardar";
+
+	    const data = e.response?.data;
+
+	    if (data) {
+	      if (typeof data === "string") {
+	        // Caso: backend devuelve solo un string
+	        msg = data;
+	      } else if (typeof data === "object") {
+	        // Caso: backend devuelve { message: "...", ... }
+	        msg = data.message || data.error || msg;
+	      }
+	    }
+
+	    message.error(msg);
+	  }
   };
 
   const eliminar = async (item: ActoInmueble) => {
@@ -178,46 +198,86 @@ const ActosInmueblesPage = () => {
         onCancel={() => setOpenModal(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Acto Registral" name="actoRegistralId" rules={[{ required: true }]}>
-            <Select
-              options={actos.map((a) => ({ label: a.descripcion, value: a.id }))}
-            />
-          </Form.Item>
+		  {/* Acto registral - Por defecto solo Bien de Familia */}
+		  <Form.Item
+		    label="Acto registral"
+		    name="actoRegistralId"
+		    rules={[{ required: true, message: "El acto es obligatorio" }]}
+		  >
+		    <Select
+			placeholder="Seleccione un Acto"
+					      options={
+							actos.filter(i => (i.id === 1))
+							.map((i) => ({
+					        label: `${i.descripcion}`,
+					        value: i.id,
+					      }))}
+					      showSearch
+					      optionFilterProp="label"
+		    />
+		  </Form.Item>
 
-          <Form.Item label="Inmueble" name="inmuebleId" rules={[{ required: true }]}>
-            <Select
-              options={inmuebles.map((i) => ({ label: i.matricula, value: i.id }))}
-            />
-          </Form.Item>
+		  {/* Inmueble (una sola columna) */}
+		  <Form.Item
+		    label="Inmueble"
+		    name="inmuebleId"
+		    rules={[{ required: true, message: "El inmueble es obligatorio" }]}
+		  >
+		    <Select
+		      placeholder="Seleccione un inmueble"
+		      options={
+				inmuebles.filter(i => (i.cantTitulares ?? 0) > 0)
+				.map((i) => ({
+		        label: `(${i.matricula}) - (${i.nomenclaturaCatastral})`,
+		        value: i.id,
+		      }))}
+		      showSearch
+		      optionFilterProp="label"
+		    />
+		  </Form.Item>
 
-          <Form.Item label="Fecha Desde" name="fechaDesde">
-            <DatePicker format="YYYY-MM-DD" />
-          </Form.Item>
 
-          <Form.Item label="Fecha Hasta" name="fechaHasta">
-            <DatePicker format="YYYY-MM-DD" />
-          </Form.Item>
+		  {/* 🔹 Fecha Desde / Fecha Hasta en la misma fila */}
+		  <Row gutter={16}>
+		    <Col xs={24} sm={12}>
+		      <Form.Item label="Fecha Desde" name="fechaDesde" rules={[{ required: true, message: "La Fecha Desde es obligatoria" }]}
+>
+		        <DatePicker style={{ width: "100%" }} />
+		      </Form.Item>
+		    </Col>
+		    <Col xs={24} sm={12}>
+		      <Form.Item label="Fecha Hasta" name="fechaHasta">
+		        <DatePicker style={{ width: "100%" }} />
+		      </Form.Item>
+		    </Col>
+		  </Row>
 
-          <Form.Item label="Juzgado" name="juzgado">
-            <Input />
-          </Form.Item>
+		  {/* Expediente solo, ancho completo */}
+		  <Form.Item label="Nro de expediente" name="expediente" rules={[{ required: true, message: "La Fecha Desde es obligatoria" }]}>
+		    <Input />
+		  </Form.Item>
 
-          <Form.Item label="Expediente" name="expediente">
-            <Input />
-          </Form.Item>
+		  {/* 🔹 Libro / Tomo / Folio en la misma fila */}
+		  <Row gutter={16}>
+		    <Col xs={24} sm={8}>
+		      <Form.Item label="Libro" name="libro">
+		        <Input />
+		      </Form.Item>
+		    </Col>
+		    <Col xs={24} sm={8}>
+		      <Form.Item label="Tomo" name="tomo">
+		        <Input />
+		      </Form.Item>
+		    </Col>
+		    <Col xs={24} sm={8}>
+		      <Form.Item label="Folio" name="folio">
+		        <Input />
+		      </Form.Item>
+		    </Col>
+		  </Row>
 
-          <Form.Item label="Libro" name="libro">
-            <Input />
-          </Form.Item>
-
-          <Form.Item label="Tomo" name="tomo">
-            <Input />
-          </Form.Item>
-
-          <Form.Item label="Folio" name="folio">
-            <Input />
-          </Form.Item>
-        </Form>
+		  {/* resto de campos / botones */}
+		</Form>
       </Modal>
     </div>
   );

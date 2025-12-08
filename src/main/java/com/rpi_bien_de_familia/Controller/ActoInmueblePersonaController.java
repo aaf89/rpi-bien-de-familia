@@ -58,8 +58,7 @@ public class ActoInmueblePersonaController {
         }
 
         existente.setActoInmueble(datos.getActoInmueble());
-        existente.setPersona(datos.getPersona());
-        existente.setTipoParticipacion(datos.getTipoParticipacion());
+        existente.setPersonaInmueble(datos.getPersonaInmueble());
 
         ActoInmueblePersona actualizado = actoInmueblePersonaService.guardar(existente);
         return ResponseEntity.ok(actualizado);

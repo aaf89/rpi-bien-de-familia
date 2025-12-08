@@ -6,4 +6,6 @@ import com.rpi_bien_de_familia.Entity.ActoInmueble;
 
 public interface ActoInmuebleRepository extends JpaRepository<ActoInmueble, Long>{
 
+	boolean existsByInmuebleIdAndActoRegistralIdAndFechaHastaIsNull(Long inmuebleId, Long actoRegistralId);
+
 }

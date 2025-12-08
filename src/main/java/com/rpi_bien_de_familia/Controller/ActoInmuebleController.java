@@ -45,6 +45,7 @@ public class ActoInmuebleController {
     @PostMapping
     public ResponseEntity<ActoInmueble> crear(@RequestBody ActoInmueble actoInmueble) {
         actoInmueble.setId(null);
+    
         ActoInmueble nuevo = actoInmuebleService.guardar(actoInmueble);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }

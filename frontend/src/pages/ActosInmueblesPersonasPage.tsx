@@ -17,9 +17,17 @@ interface Persona {
   apellido: string;
 }
 
-interface TipoParticipacion {
+interface Inmueble {
   id: number;
-  descripcion: string;
+  matricula: string;
+}
+
+interface PersonaInmueble {
+  id: number;
+  persona: Persona;
+  inmueble: Inmueble;
+  numerador: number;
+  denominador: number;
 }
 
 interface ActoInmueble {
@@ -31,20 +39,18 @@ interface ActoInmueble {
 interface ActoInmueblePersona {
   id: number;
   actoInmueble: ActoInmueble;
-  persona: Persona;
-  tipoParticipacion: TipoParticipacion;
+  personaInmueble: PersonaInmueble;
 }
 
 const API = "http://localhost:8080/api/actos-inmuebles-personas";
 const API_AI = "http://localhost:8080/api/actos-inmuebles";
-const API_PERSONAS = "http://localhost:8080/api/personas";
-const API_TIPOS = "http://localhost:8080/api/tipos-participaciones";
+// 👇 nuevo: endpoint de PersonaInmueble (ajustá el path si es distinto)
+const API_PERSONAS_INMUEBLES = "http://localhost:8080/api/personas-inmuebles";
 
 const ActosInmueblesPersonasPage = () => {
   const [items, setItems] = useState<ActoInmueblePersona[]>([]);
   const [actosInmuebles, setActosInmuebles] = useState<ActoInmueble[]>([]);
-  const [personas, setPersonas] = useState<Persona[]>([]);
-  const [tipos, setTipos] = useState<TipoParticipacion[]>([]);
+  const [personasInmuebles, setPersonasInmuebles] = useState<PersonaInmueble[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [editing, setEditing] = useState<ActoInmueblePersona | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,17 +59,15 @@ const ActosInmueblesPersonasPage = () => {
   const cargar = async () => {
     try {
       setLoading(true);
-      const [ap, ai, per, tp] = await Promise.all([
+      const [ap, ai, pi] = await Promise.all([
         axios.get(API),
         axios.get(API_AI),
-        axios.get(API_PERSONAS),
-        axios.get(API_TIPOS),
+        axios.get(API_PERSONAS_INMUEBLES),
       ]);
 
       setItems(ap.data);
       setActosInmuebles(ai.data);
-      setPersonas(per.data);
-      setTipos(tp.data);
+      setPersonasInmuebles(pi.data);
     } catch {
       message.error("Error cargando datos");
     } finally {
@@ -85,8 +89,7 @@ const ActosInmueblesPersonasPage = () => {
     setEditing(item);
     form.setFieldsValue({
       actoInmuebleId: item.actoInmueble.id,
-      personaId: item.persona.id,
-      tipoParticipacionId: item.tipoParticipacion.id,
+      personaInmuebleId: item.personaInmueble.id,
     });
     setOpenModal(true);
   };
@@ -96,8 +99,7 @@ const ActosInmueblesPersonasPage = () => {
 
     const payload = {
       actoInmueble: { id: v.actoInmuebleId },
-      persona: { id: v.personaId },
-      tipoParticipacion: { id: v.tipoParticipacionId },
+      personaInmueble: { id: v.personaInmuebleId },
     };
 
     try {
@@ -135,22 +137,26 @@ const ActosInmueblesPersonasPage = () => {
 
       <Table dataSource={items} loading={loading} rowKey="id">
         <Table.Column
-          title="Acto-Inmueble"
-          render={(_, r) =>
+          title="Acto - Inmueble"
+          render={(_, r: ActoInmueblePersona) =>
             `${r.actoInmueble.actoRegistral.descripcion} – ${r.actoInmueble.inmueble.matricula}`
           }
         />
         <Table.Column
           title="Persona"
-          render={(_, r) => `${r.persona.apellido}, ${r.persona.nombre}`}
+          render={(_, r: ActoInmueblePersona) =>
+            `${r.personaInmueble.persona.apellido}, ${r.personaInmueble.persona.nombre}`
+          }
         />
         <Table.Column
           title="Participación"
-          render={(_, r) => r.tipoParticipacion.descripcion}
+          render={(_, r: ActoInmueblePersona) =>
+            `${r.personaInmueble.numerador}/${r.personaInmueble.denominador}`
+          }
         />
         <Table.Column
           title="Acciones"
-          render={(_, record) => (
+          render={(_, record: ActoInmueblePersona) => (
             <Space>
               <Button size="small" onClick={() => abrirEditar(record)}>
                 Editar
@@ -167,12 +173,16 @@ const ActosInmueblesPersonasPage = () => {
 
       <Modal
         open={openModal}
-        title={editing ? "Editar Participación" : "Agregar Participación"}
+        title={editing ? "Editar asignación" : "Agregar asignación"}
         onOk={guardar}
         onCancel={() => setOpenModal(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Acto Inmueble" name="actoInmuebleId" rules={[{ required: true }]}>
+          <Form.Item
+            label="Acto Inmueble"
+            name="actoInmuebleId"
+            rules={[{ required: true }]}
+          >
             <Select
               options={actosInmuebles.map((ai) => ({
                 value: ai.id,
@@ -181,24 +191,15 @@ const ActosInmueblesPersonasPage = () => {
             />
           </Form.Item>
 
-          <Form.Item label="Persona" name="personaId" rules={[{ required: true }]}>
-            <Select
-              options={personas.map((p) => ({
-                value: p.id,
-                label: `${p.apellido}, ${p.nombre}`,
-              }))}
-            />
-          </Form.Item>
-
           <Form.Item
-            label="Tipo de Participación"
-            name="tipoParticipacionId"
+            label="Persona / Titularidad"
+            name="personaInmuebleId"
             rules={[{ required: true }]}
           >
             <Select
-              options={tipos.map((t) => ({
-                value: t.id,
-                label: t.descripcion,
+              options={personasInmuebles.map((pi) => ({
+                value: pi.id,
+                label: `${pi.persona.apellido}, ${pi.persona.nombre} – ${pi.inmueble.matricula} (${pi.numerador}/${pi.denominador})`,
               }))}
             />
           </Form.Item>

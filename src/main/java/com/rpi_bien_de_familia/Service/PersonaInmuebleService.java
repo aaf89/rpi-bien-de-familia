@@ -47,11 +47,10 @@ public class PersonaInmuebleService {
         personaInmuebleRepository.save(pi);
     }
     
-    public PersonaInmueble guardar(PersonaInmueble personaInmueble) {
+    public PersonaInmueble crear(PersonaInmueble personaInmueble) {
     	Long idInmueble = personaInmueble.getInmueble().getId();
     	Integer cantTitulares = (int) personaInmuebleRepository.countByInmuebleId(idInmueble)+1;
     	
-    	System.out.println("Cant Titulares " + cantTitulares);
     	if (cantTitulares > 1) {
     		recalcularPartes(idInmueble, cantTitulares);
     	}
@@ -59,6 +58,21 @@ public class PersonaInmuebleService {
     	personaInmueble.setNumerador(1);
     	personaInmueble.setDenominador(cantTitulares);
         return personaInmuebleRepository.save(personaInmueble);
+    }
+    
+    public PersonaInmueble actualizar(Long id, PersonaInmueble cambios) {
+    	PersonaInmueble existente = personaInmuebleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Titularidad no encontrada"));
+
+        existente.setPersona(cambios.getPersona());
+    	Integer cantTitulares = (int) personaInmuebleRepository.countByInmuebleId(existente.getInmueble().getId());
+
+        PersonaInmueble guardado = personaInmuebleRepository.save(existente);
+
+        Long inmuebleId = existente.getInmueble().getId();
+        recalcularPartes(inmuebleId, cantTitulares);
+
+        return guardado;
     }
     
     private void recalcularPartes(Long idInmueble, Integer cantTitulares) {
@@ -73,6 +87,12 @@ public class PersonaInmuebleService {
     }
 
     public void eliminar(Long id) {
+    	PersonaInmueble existente = personaInmuebleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Titularidad no encontrada"));
+
+    	Long idInmueble = existente.getInmueble().getId();
+    	Integer cantTitulares = (int) personaInmuebleRepository.countByInmuebleId(idInmueble)-1;
         personaInmuebleRepository.deleteById(id);
+        recalcularPartes(idInmueble, cantTitulares);
     }
 }

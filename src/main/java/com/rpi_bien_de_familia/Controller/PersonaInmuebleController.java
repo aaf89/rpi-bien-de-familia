@@ -60,22 +60,19 @@ public class PersonaInmuebleController {
         throw new RuntimeException("CORTADO ADREDE POR DD");*/
         personaInmueble.setId(null);
         
-        PersonaInmueble nuevo = personaInmuebleService.guardar(personaInmueble);
+        PersonaInmueble nuevo = personaInmuebleService.crear(personaInmueble);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PersonaInmueble> actualizar(@PathVariable Long id,
                                                       @RequestBody PersonaInmueble datos) {
-        PersonaInmueble existente = personaInmuebleService.buscarPorId(id);
+    	PersonaInmueble existente = personaInmuebleService.buscarPorId(id);
         if (existente == null) {
             return ResponseEntity.notFound().build();
         }
-        existente.setPersona(datos.getPersona());
-        existente.setInmueble(datos.getInmueble());
-        existente.setNumerador(datos.getNumerador());
-        existente.setDenominador(datos.getDenominador());
-        PersonaInmueble actualizado = personaInmuebleService.guardar(existente);
+
+        PersonaInmueble actualizado = personaInmuebleService.actualizar(id, datos);
         return ResponseEntity.ok(actualizado);
     }
 
