@@ -12,26 +12,31 @@ import {
 import axios from "axios";
 
 
-interface Persona {
+interface PersonasPageProps {
+  onVerInmuebles?: (id: number) => void;
+}
+
+interface PersonaDTO {
   id: number;
   cuit: string;
   apellido: string;
   nombre: string;
+  cantInmuebles: number;
 }
 
 const API_URL = "http://localhost:8080/api/personas";
 
-const PersonasPage = () => {
-  const [personas, setPersonas] = useState<Persona[]>([]);
+const PersonasPage: React.FC<PersonasPageProps> = ({ onVerInmuebles }) => {
+  const [personas, setPersonas] = useState<PersonaDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
+  const [editingPersona, setEditingPersona] = useState<PersonaDTO | null>(null);
   const [form] = Form.useForm();
 
   const cargarPersonas = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<Persona[]>(
+      const res = await axios.get<PersonaDTO[]>(
         API_URL
       );
       setPersonas(res.data);
@@ -54,7 +59,7 @@ const PersonasPage = () => {
     };
 
     // Abrir modal para EDITAR
-    const abrirModalEditar = (persona: Persona) => {
+    const abrirModalEditar = (persona: PersonaDTO) => {
       setEditingPersona(persona);
       form.setFieldsValue({
         cuit: persona.cuit,
@@ -90,15 +95,19 @@ const PersonasPage = () => {
         setEditingPersona(null);
         cargarPersonas();
       } catch (e) {
-        // si falla la validación de form, no mostramos error extra
-        if (!(e as any).errorFields) {
-          message.error("No se pudo guardar la persona");
-        }
-      }
+			if (e?.errorFields) return; // error de validación del form, no mostramos mensaje extra
+			  console.error("Error al guardar inmueble", e);
+
+			  const backendMessage =
+			    e?.response?.data?.message || 
+			    e?.response?.data?.error ||   // Spring manda "error": "Internal Server Error"
+			    e?.message;                   // mensaje genérico de axios
+	 		    message.error(backendMessage || "No se pudo guardar el inmueble");
+		    }
     };
 
     // Eliminar
-    const onEliminar = async (persona: Persona) => {
+    const onEliminar = async (persona: PersonaDTO) => {
       try {
         await axios.delete(
           `http://localhost:8080/api/personas/${persona.id}`
@@ -123,17 +132,30 @@ const PersonasPage = () => {
         </Button>
 
         <Table rowKey="id" dataSource={personas} loading={loading}>
-          <Table.Column<Persona> title="ID" dataIndex="id" />
-          <Table.Column<Persona> title="Cuit/Cuil" dataIndex="cuit" />
-          <Table.Column<Persona>
+          <Table.Column<PersonaDTO> title="ID" dataIndex="id" />
+          <Table.Column<PersonaDTO> title="Cuit/Cuil" dataIndex="cuit" />
+          <Table.Column<PersonaDTO>
             title="Apellidos"
             dataIndex="apellido"
           />
-		  <Table.Column<Persona>
+		  <Table.Column<PersonaDTO>
 		    title="Nombres"
 		    dataIndex="nombre"
 		  />
-          <Table.Column<Persona>
+		  
+		  <Table.Column<PersonaDTO>
+		  		  title="Titulares"
+		  		  render={(_, record) => (
+		  		    <Button
+		  		      size="small"
+		  		      onClick={() => onVerInmuebles && onVerInmuebles(record.id)}
+		  		    >
+		  				{`Ver Inmuebles (${record.cantInmuebles ?? 0})`}
+		  		    </Button>
+		  		  )}
+		  		/>
+				
+          <Table.Column<PersonaDTO>
             title="Acciones"
             key="acciones"
             render={(_, record) => (
@@ -170,13 +192,19 @@ const PersonasPage = () => {
           cancelText="Cancelar"
         >
           <Form form={form} layout="vertical">
-            <Form.Item
-              label="Cuit/Cuil"
-              name="cuit"
-              rules={[{ required: true, message: "El cuit es obligatoria" }]}
-            >
-              <Input />
-            </Form.Item>
+		  <Form.Item
+		    label="Cuit/Cuil"
+		    name="cuit"
+		    rules={[
+		      { required: true, message: "El CUIL es obligatorio" },
+		      {
+		        pattern: /^\d{2}-\d{8}-\d$/,
+		        message: "Formato inválido. Usá XX-XXXXXXXX-X",
+		      },
+		    ]}
+		  >
+		    <Input placeholder="Ej: 20-12345678-3" maxLength={13} />
+		  </Form.Item>
 
             <Form.Item
               label="Apellidos"

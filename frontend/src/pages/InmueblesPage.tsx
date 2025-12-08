@@ -113,8 +113,8 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({ onVerTitulares }) => {
 		  console.error("Error al guardar inmueble", e);
 
 		  const backendMessage =
-		    e?.response?.data?.message || // por si algún día devolvés {message: "..."}
-		    e?.response?.data?.error ||   // en tu caso Spring manda "error": "Internal Server Error"
+		    e?.response?.data?.message || 
+		    e?.response?.data?.error ||   // Spring manda "error": "Internal Server Error"
 		    e?.message;                   // mensaje genérico de axios
 
 		  message.error(backendMessage || "No se pudo guardar el inmueble");

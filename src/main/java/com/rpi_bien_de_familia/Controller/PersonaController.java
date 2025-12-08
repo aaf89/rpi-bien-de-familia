@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rpi_bien_de_familia.Dto.PersonaDTO;
 import com.rpi_bien_de_familia.Entity.Persona;
 import com.rpi_bien_de_familia.Service.PersonaService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/personas")
@@ -26,7 +29,7 @@ public class PersonaController {
 	}
 	
 	@GetMapping
-	public List<Persona> listar(){
+	public List<PersonaDTO> listar(){
 		return personaService.listar();
 	}
 	
@@ -49,26 +52,17 @@ public class PersonaController {
     }
 	
 	@PostMapping
-    public ResponseEntity<Persona> crear(@RequestBody Persona persona) {
-		persona.setId(null); 
-		Persona nueva = personaService.guardar(persona);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
-    }
-
-	@PutMapping("/{id}")
-	public ResponseEntity<Persona> actualizar(@PathVariable Long id, @RequestBody Persona persona){
-		Persona persona_a_actualizar = personaService.buscarPorId(id);
-		if(persona_a_actualizar == null) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		persona_a_actualizar.setCuit(persona.getCuit());
-		persona_a_actualizar.setApellido(persona.getApellido());
-		persona_a_actualizar.setNombre(persona.getNombre());
-		
-		Persona persona_actualizada = personaService.guardar(persona_a_actualizar);
-		return ResponseEntity.ok(persona_actualizada);
+	public ResponseEntity<Persona> crear(@Valid @RequestBody Persona persona) {
+	    Persona nueva = personaService.crearPersona(persona);
+	    return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
 	}
+	
+	@PutMapping("/{id}")
+    public ResponseEntity<Persona> actualizar(@PathVariable Long id,
+                                              @Valid @RequestBody Persona persona) {
+        Persona personaActualizada = personaService.actualizarPersona(id, persona);
+        return ResponseEntity.ok(personaActualizada);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

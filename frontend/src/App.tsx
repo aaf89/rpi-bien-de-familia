@@ -34,6 +34,7 @@ function App() {
   // Estado inicial por defecto
   const [selectedKey, setSelectedKey] = useState<MenuKey>("inmuebles");
   const [filtroInmuebleId, setFiltroInmuebleId] = useState<number | null>(null);
+  const [filtroPersonaId, setFiltroPersonaId] = useState<number | null>(null);
 
   // Al montar, intento leer lo último que guardé en localStorage
   useEffect(() => {
@@ -59,7 +60,15 @@ function App() {
   const renderContent = () => {
 	switch (selectedKey) {
 		case "personas":
-        	return <PersonasPage />;
+		  return (
+		    <PersonasPage
+		      onVerInmuebles={(id) => {
+		        setFiltroPersonaId(id);
+		        setFiltroInmuebleId(null);
+		        setSelectedKey("personasInmuebles");
+		      }}
+		    />
+		  );
 		case "ciudades":
 	        return <CiudadesPage />;
 		case "departamentos":
@@ -74,21 +83,30 @@ function App() {
 		  	return <ActosInmueblesPersonasPage />;
 		case "personasInmuebles":
 			      return (
-			        <PersonasInmueblesPage
-			          filtroInmuebleId={filtroInmuebleId}
-			          onVolver={() => {
-			            setFiltroInmuebleId(null);   // limpiamos el filtro
-			            setSelectedKey("inmuebles"); // volvemos a la pantalla de Inmuebles
-			          }}
-			        />
+					<PersonasInmueblesPage
+					      filtroInmuebleId={filtroInmuebleId}
+					      filtroPersonaId={filtroPersonaId}
+					      onVolver={() => {
+					        if (filtroInmuebleId != null) {
+					          setFiltroInmuebleId(null);
+					          setSelectedKey("inmuebles");
+					        } else if (filtroPersonaId != null) {
+					          setFiltroPersonaId(null);
+					          setSelectedKey("personas");
+					        } else {
+					          setSelectedKey("inmuebles");
+					        }
+					      }}
+					    />
 			      );
 		case "inmuebles":
 			  return (
 			    <InmueblesPage
-			      onVerTitulares={(id) => {
-			        setFiltroInmuebleId(id);
-			        setSelectedKey("personasInmuebles");
-			      }}
+				onVerTitulares={(id) => {
+				    setFiltroInmuebleId(id);
+				    setFiltroPersonaId(null);
+				    setSelectedKey("personasInmuebles");
+				  }}
 			    />
 			  );
     }
