@@ -16,6 +16,11 @@ import {
 import axios from "axios";
 import dayjs from "dayjs";
 
+interface ActosInmueblesPageProps {
+  filtroInmuebleId?: number | null;
+  onVolver?: () => void;
+}
+
 interface ActoRegistral {
   id: number;
   descripcion: string;
@@ -45,7 +50,10 @@ const API = "http://localhost:8080/api/actos-inmuebles";
 const API_ACTOS = "http://localhost:8080/api/actos-registrales";
 const API_INMUEBLES = "http://localhost:8080/api/inmuebles";
 
-const ActosInmueblesPage = () => {
+const ActosInmueblesPage : React.FC<ActosInmueblesPageProps> = ({
+  filtroInmuebleId,
+  onVolver,
+  }) => {
   const [items, setItems] = useState<ActoInmueble[]>([]);
   const [actos, setActos] = useState<ActoRegistral[]>([]);
   const [inmuebles, setInmuebles] = useState<InmuebleDTO[]>([]);
@@ -74,8 +82,14 @@ const ActosInmueblesPage = () => {
 
   useEffect(() => {
     cargar();
-  }, []);
-
+  }, [filtroInmuebleId]);
+  
+  const volver = () => {
+     if (onVolver) {
+       onVolver();
+     }
+   };
+   
   const abrirNuevo = () => {
     setEditing(null);
     form.resetFields();
@@ -162,14 +176,16 @@ const ActosInmueblesPage = () => {
       <Button type="primary" onClick={abrirNuevo} style={{ marginBottom: 16 }}>
         Nuevo Acto en Inmueble
       </Button>
+	  <Button onClick={volver} style={{ marginBottom: 16, marginRight: 8 }}>
+	 	Volver
+	  </Button>
 
       <Table dataSource={items} loading={loading} rowKey="id">
         <Table.Column title="Acto" render={(_, r) => r.actoRegistral.descripcion} />
         <Table.Column title="Inmueble" render={(_, r) => r.inmueble.matricula} />
         <Table.Column title="Desde" dataIndex="fechaDesde" />
         <Table.Column title="Hasta" dataIndex="fechaHasta" />
-        <Table.Column title="Juzgado" dataIndex="juzgado" />
-		<Table.Column title="Expediente" dataIndex="numeroExpediente" />
+        <Table.Column title="Expediente" dataIndex="numeroExpediente" />
 		<Table.Column title="Libro" dataIndex="libro" />
 		<Table.Column title="Tomo" dataIndex="tomo" />
 		<Table.Column title="Folio" dataIndex="folio" />

@@ -64,14 +64,9 @@ public class PersonaController {
         return ResponseEntity.ok(personaActualizada);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        Persona persona = personaService.buscarPorId(id);
-        if (persona == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        personaService.eliminar(id);
-        return ResponseEntity.noContent().build();
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+	    personaService.eliminar(id);
+	    return ResponseEntity.noContent().build();
+	}
 }

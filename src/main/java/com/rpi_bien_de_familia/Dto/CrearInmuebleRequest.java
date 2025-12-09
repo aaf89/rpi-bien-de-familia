@@ -7,5 +7,6 @@ public class CrearInmuebleRequest {
     private String matricula;
     private String nomenclaturaCatastral;
     private Long personaId;
+    private Long ciudadId;
 }
 

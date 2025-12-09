@@ -16,6 +16,8 @@ import ActosInmueblesPersonasPage from "./pages/ActosInmueblesPersonasPage";
 import ActosRegistralesPage from "./pages/ActosRegistralesPage";
 import PersonasInmueblesPage from "./pages/PersonasInmueblesPage";
 import TiposParticipacionesPage from "./pages/TiposParticipacionesPage";
+import EstadisticasBienDeFamiliaPage from "./pages/EstadisticasBienDeFamiliaPage";
+
 
 const { Header, Content, Sider, Footer } = Layout;
 
@@ -28,15 +30,17 @@ type MenuKey =
   | "tiposParticipaciones"
   | "personasInmuebles"
   | "actosInmuebles"
-  | "actosInmueblesPersonas";
+  | "actosInmueblesPersonas"
+  | "estadisticasBF";
 
 function App() {
-  // Estado inicial por defecto
   const [selectedKey, setSelectedKey] = useState<MenuKey>("inmuebles");
   const [filtroInmuebleId, setFiltroInmuebleId] = useState<number | null>(null);
   const [filtroPersonaId, setFiltroPersonaId] = useState<number | null>(null);
 
-  // Al montar, intento leer lo último que guardé en localStorage
+  // 👉 nuevo: para Bien de Familia
+  const [inmuebleSeleccionadoId, setInmuebleSeleccionadoId] = useState<number | null>(null);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("selectedMenuKey") as MenuKey | null;
@@ -44,7 +48,7 @@ function App() {
         setSelectedKey(saved);
       }
     } catch {
-      // por las dudas, no hago nada si localStorage falla
+      // nada
     }
   }, []);
 
@@ -53,62 +57,83 @@ function App() {
     try {
       localStorage.setItem("selectedMenuKey", key);
     } catch {
-      // si falla localStorage, tampoco rompemos la app
+      // nada
     }
   };
 
   const renderContent = () => {
-	switch (selectedKey) {
-		case "personas":
-		  return (
-		    <PersonasPage
-		      onVerInmuebles={(id) => {
-		        setFiltroPersonaId(id);
-		        setFiltroInmuebleId(null);
-		        setSelectedKey("personasInmuebles");
-		      }}
-		    />
-		  );
-		case "ciudades":
-	        return <CiudadesPage />;
-		case "departamentos":
-	        return <DepartamentosPage />;
-		case "actosRegistrales":
-		  	return <ActosRegistralesPage />;
-		case "tiposParticipaciones":
-			return <TiposParticipacionesPage />;
-		case "actosInmuebles":
-			return <ActosInmueblesPage />;
-		case "actosInmueblesPersonas":
-		  	return <ActosInmueblesPersonasPage />;
-		case "personasInmuebles":
-			      return (
-					<PersonasInmueblesPage
-					      filtroInmuebleId={filtroInmuebleId}
-					      filtroPersonaId={filtroPersonaId}
-					      onVolver={() => {
-					        if (filtroInmuebleId != null) {
-					          setFiltroInmuebleId(null);
-					          setSelectedKey("inmuebles");
-					        } else if (filtroPersonaId != null) {
-					          setFiltroPersonaId(null);
-					          setSelectedKey("personas");
-					        } else {
-					          setSelectedKey("inmuebles");
-					        }
-					      }}
-					    />
-			      );
-		case "inmuebles":
-			  return (
-			    <InmueblesPage
-				onVerTitulares={(id) => {
-				    setFiltroInmuebleId(id);
-				    setFiltroPersonaId(null);
-				    setSelectedKey("personasInmuebles");
-				  }}
-			    />
-			  );
+    switch (selectedKey) {
+      case "personas":
+        return (
+          <PersonasPage
+            onVerInmuebles={(id) => {
+              setFiltroPersonaId(id);
+              setFiltroInmuebleId(null);
+              setSelectedKey("personasInmuebles");
+            }}
+          />
+        );
+      case "ciudades":
+        return <CiudadesPage />;
+      case "departamentos":
+        return <DepartamentosPage />;
+      case "actosRegistrales":
+        return <ActosRegistralesPage />;
+      case "tiposParticipaciones":
+        return <TiposParticipacionesPage />;
+      case "actosInmuebles":
+        return (
+          <ActosInmueblesPage
+            // si llegaste desde Inmuebles, filtra por ese inmueble
+            filtroInmuebleId={inmuebleSeleccionadoId ?? undefined}
+            // solo tiene "volver" cuando venís desde un inmueble concreto
+            onVolver={
+              inmuebleSeleccionadoId != null
+                ? () => {
+                    setInmuebleSeleccionadoId(null);
+                    setSelectedKey("inmuebles");
+                  }
+                : undefined
+            }
+          />
+        );
+      case "actosInmueblesPersonas":
+        return <ActosInmueblesPersonasPage />;
+      case "personasInmuebles":
+        return (
+          <PersonasInmueblesPage
+            filtroInmuebleId={filtroInmuebleId}
+            filtroPersonaId={filtroPersonaId}
+            onVolver={() => {
+              if (filtroInmuebleId != null) {
+                setFiltroInmuebleId(null);
+                setSelectedKey("inmuebles");
+              } else if (filtroPersonaId != null) {
+                setFiltroPersonaId(null);
+                setSelectedKey("personas");
+              } else {
+                setSelectedKey("inmuebles");
+              }
+            }}
+          />
+        );
+      case "inmuebles":
+      default:
+        return (
+          <InmueblesPage
+            onVerTitulares={(id) => {
+              setFiltroInmuebleId(id);
+              setFiltroPersonaId(null);
+              setSelectedKey("personasInmuebles");
+            }}
+            onVerBienDeFamilia={(id) => {
+              setInmuebleSeleccionadoId(id);
+              setSelectedKey("actosInmuebles");
+            }}
+          />
+        );
+		case "estadisticasBF":
+		  return <EstadisticasBienDeFamiliaPage />;
     }
   };
 
@@ -137,39 +162,42 @@ function App() {
           selectedKeys={[selectedKey]}
           onClick={(item) => handleMenuClick(item.key as MenuKey)}
           items={[
-            { key: "inmuebles", icon: <HomeOutlined />, label: "Inmuebles" },
             { key: "personas", icon: <TeamOutlined />, label: "Personas" },
-			{
-			      key: "separator-1",
-			      disabled: true,
-			      label: (
-			        <div
-			          style={{
-			            borderTop: "1px solid rgba(255, 255, 255, 0.2)",
-			            margin: "8px 0",
-			          }}
-			        />
-			      ),
-			    },            { key: "departamentos", icon: <ApartmentOutlined />, label: "Departamentos" },
-			{ key: "ciudades", icon: <EnvironmentOutlined />, label: "Ciudades" },
-			{ key: "actosRegistrales", icon: <ApartmentOutlined />, label: "Actos Registrales" },
-			{ key: "tiposParticipaciones", icon: <ApartmentOutlined />, label: "Tipos de Participacion" },
-			{
-				key: "separator-2",
-				disabled: true,
-				label: (
-					<div
-					    style={{
-					    borderTop: "1px solid rgba(255, 255, 255, 0.2)",
-					    margin: "8px 0",
-					    }}
-					/>
-				),
-			},
-			{ key: "personasInmuebles", icon: <ApartmentOutlined />, label: "Personas Inmuebles" },
-			{ key: "actosInmuebles", icon: <ApartmentOutlined />, label: "Actos Inmuebles" },
-			{ key: "actosInmueblesPersonas", icon: <ApartmentOutlined />, label: "Actos Inmuebles Personas" },
-
+            { key: "inmuebles", icon: <HomeOutlined />, label: "Inmuebles" },
+            { key: "actosInmuebles", icon: <ApartmentOutlined />, label: "Bien de Familia" },
+			{ key: "estadisticasBF", icon: <ApartmentOutlined />, label: "Estadísticas" },
+            {
+              key: "separator-1",
+              disabled: true,
+              label: (
+                <div
+                  style={{
+                    borderTop: "1px solid rgba(255, 255, 255, 0.2)",
+                    margin: "8px 0",
+                  }}
+                />
+              ),
+            },
+            { key: "departamentos", icon: <ApartmentOutlined />, label: "Departamentos" },
+            { key: "ciudades", icon: <EnvironmentOutlined />, label: "Ciudades" },
+            { key: "actosRegistrales", icon: <ApartmentOutlined />, label: "Actos Registrales" },
+            {
+              key: "tiposParticipaciones",
+              icon: <ApartmentOutlined />,
+              label: "Tipos de Participacion",
+            },
+            {
+              key: "separator-2",
+              disabled: true,
+              label: (
+                <div
+                  style={{
+                    borderTop: "1px solid rgba(255, 255, 255, 0.2)",
+                    margin: "8px 0",
+                  }}
+                />
+              ),
+            },
           ]}
         />
       </Sider>

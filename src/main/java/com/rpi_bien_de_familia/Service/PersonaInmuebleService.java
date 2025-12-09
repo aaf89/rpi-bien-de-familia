@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.rpi_bien_de_familia.Entity.Inmueble;
 import com.rpi_bien_de_familia.Entity.Persona;
 import com.rpi_bien_de_familia.Entity.PersonaInmueble;
+import com.rpi_bien_de_familia.Exception.ValidacionNegocioException;
+import com.rpi_bien_de_familia.Repository.ActoInmuebleRepository;
 import com.rpi_bien_de_familia.Repository.PersonaInmuebleRepository;
 
 @Service
@@ -16,14 +18,17 @@ public class PersonaInmuebleService {
     private final PersonaInmuebleRepository personaInmuebleRepository;
     private final PersonaService personaService;
     private final InmuebleService inmuebleService;
+    private final ActoInmuebleRepository actoInmuebleRepository;
 
     public PersonaInmuebleService(
             PersonaInmuebleRepository repo,
             PersonaService personaService,
-            InmuebleService inmuebleService) {
+            InmuebleService inmuebleService,
+            ActoInmuebleRepository actoInmuebleRepository) {
         this.personaInmuebleRepository = repo;
         this.personaService = personaService;
         this.inmuebleService = inmuebleService;
+        this.actoInmuebleRepository = actoInmuebleRepository;
     }
     
     public List<PersonaInmueble> listar() {
@@ -90,6 +95,19 @@ public class PersonaInmuebleService {
     	PersonaInmueble existente = personaInmuebleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Titularidad no encontrada"));
 
+    	Long idActoBienDeFamilia = 1L;
+
+        boolean inmuebleTieneBF = actoInmuebleRepository
+                .existsByInmuebleIdAndActoRegistralIdAndFechaHastaIsNull(
+                        id,
+                        idActoBienDeFamilia
+                );
+
+        if (inmuebleTieneBF) {
+            throw new ValidacionNegocioException(
+                    "No se puede eliminar un titular de un inmueble con Bien de Familia vigente."
+            );
+        }
     	Long idInmueble = existente.getInmueble().getId();
     	Integer cantTitulares = (int) personaInmuebleRepository.countByInmuebleId(idInmueble)-1;
         personaInmuebleRepository.deleteById(id);

@@ -13,12 +13,14 @@ public class InmuebleDTO {
     private String nomenclaturaCatastral;
     private Ciudad ciudad;
     private Long cantTitulares;
-
-    public InmuebleDTO(Inmueble i, Long cantTitulares) {
+    private Boolean tieneBienDeFamilia;  
+    
+    public InmuebleDTO(Inmueble i, Long cantTitulares, boolean tieneBienDeFamilia) {
         this.id = i.getId();
         this.matricula = i.getMatricula();
         this.nomenclaturaCatastral = i.getNomenclaturaCatastral();
         this.ciudad = i.getCiudad();
         this.cantTitulares = cantTitulares;
+        this.tieneBienDeFamilia = tieneBienDeFamilia;
     }
 }

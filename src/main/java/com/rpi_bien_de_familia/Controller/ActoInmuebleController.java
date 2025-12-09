@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rpi_bien_de_familia.Dto.BienFamiliaEstadisticaDTO;
 import com.rpi_bien_de_familia.Entity.ActoInmueble;
 import com.rpi_bien_de_familia.Service.ActoInmuebleService;
 
@@ -77,6 +78,11 @@ public class ActoInmuebleController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         actoInmuebleService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/estadistica-anio-departamento")
+    public List<Object[]> estadisticaAnioDepartamento() {
+        return actoInmuebleService.obtenerEstadisticaAnioDepartamento();
     }
 }
 

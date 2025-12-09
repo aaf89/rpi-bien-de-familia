@@ -115,8 +115,15 @@ const PersonasPage: React.FC<PersonasPageProps> = ({ onVerInmuebles }) => {
         message.success("Persona eliminado");
         cargarPersonas();
       } catch (e) {
-        message.error("No se pudo eliminar la persona");
-      }
+		console.error("Error al eliminar la persona", e);
+		      const backendMessage =
+		        e?.response?.data?.message ||
+		        e?.response?.data?.error ||
+		        e?.message;
+
+		      message.error(backendMessage || "No se pudo eliminar la persona");
+		}
+      
     };
   
     return (

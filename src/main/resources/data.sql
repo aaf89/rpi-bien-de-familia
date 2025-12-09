@@ -49,6 +49,7 @@ insert into ciudades (id, id_departamento, codigo, descripcion) values(6, 1, '6'
 insert into ciudades (id, id_departamento, codigo, descripcion) values(7, 1, '7', 'Cutral-Co'); 
 insert into ciudades (id, id_departamento, codigo, descripcion) values(8, 1, '8', 'Plaza Huincul'); 
 insert into ciudades (id, id_departamento, codigo, descripcion) values(9, 1, '9', 'Villa El Chocón');
+INSERT INTO ciudades (id, id_departamento, codigo, descripcion) values(10, 4, '10', 'Aluminé');
 
 insert into actos_registrales(id, descripcion) values (1, 'Bien de Familia');
 insert into actos_registrales(id, descripcion) values (2, 'Hipoteca');
@@ -70,4 +71,22 @@ INSERT INTO inmuebles (id, matricula, nomenclatura_catastral, id_ciudad)
 VALUES (2, 'MC-002', '5807-9876-5432-1098-7654', 2); 
 INSERT INTO inmuebles (id, matricula, nomenclatura_catastral, id_ciudad)
 VALUES (3, 'MC-003', '5811-4567-8910-1112-2223', 3); 
+INSERT INTO inmuebles (id, matricula, nomenclatura_catastral, id_ciudad)
+VALUES (4, 'MC-004', '5804-0000-0000-0000-0001', 10);
 
+-- Titulares (personas_inmuebles)
+INSERT INTO personas_inmuebles (persona_id, inmueble_id, numerador, denominador)
+VALUES (1, 1, 1, 1);  -- María González - MC-001
+
+INSERT INTO personas_inmuebles (persona_id, inmueble_id, numerador, denominador)
+VALUES (2, 2, 1, 1);  -- Julián Pérez - MC-002
+
+INSERT INTO personas_inmuebles (persona_id, inmueble_id, numerador, denominador)
+VALUES (3, 3, 1, 1);  -- Ana Rojas - MC-003;
+
+
+DELETE FROM actos_inmuebles;
+
+
+INSERT INTO personas_inmuebles (persona_id, inmueble_id, numerador, denominador)
+VALUES (4, 4, 1, 1); -- Carlos Méndez - MC-004 (Aluminé)

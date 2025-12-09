@@ -52,40 +52,20 @@ public class InmuebleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody CrearInmuebleRequest req, BindingResult result) {
-    	Inmueble inmueble = new Inmueble();
-        inmueble.setMatricula(req.getMatricula().toUpperCase());
-        inmueble.setNomenclaturaCatastral(req.getNomenclaturaCatastral());
-
-        Inmueble inmueble_guardado = inmuebleService.crearInmueble(inmueble);
-
-        // Crear titular inicial
-        if (req.getPersonaId() != null) {
-        	personaInmuebleService.crearTitularInicial(req.getPersonaId(), inmueble_guardado.getId());
-        }	
-        return ResponseEntity.status(HttpStatus.CREATED).body(inmueble_guardado);
+    public ResponseEntity<Inmueble> crear(@RequestBody CrearInmuebleRequest req) {
+        Inmueble creado = inmuebleService.crearInmueble(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Inmueble> actualizar(@PathVariable Long id, @RequestBody Inmueble inmueble) {
-        Inmueble inmueble_a_actualizar = inmuebleService.buscarPorId(id);
-        if (inmueble_a_actualizar == null) {
-            return ResponseEntity.notFound().build();
-        }
-        inmueble_a_actualizar.setMatricula(inmueble.getMatricula().toUpperCase());
-        inmueble_a_actualizar.setNomenclaturaCatastral(inmueble.getNomenclaturaCatastral());
-
-        Inmueble inmueble_actualizado = inmuebleService.actualizarInmueble(id, inmueble_a_actualizar);
-        return ResponseEntity.ok(inmueble_actualizado);
+    public ResponseEntity<Inmueble> actualizar(@PathVariable Long id,
+    										   @RequestBody CrearInmuebleRequest req) {
+        Inmueble actualizado = inmuebleService.actualizarInmueble(id, req);
+        return ResponseEntity.ok(actualizado);
     }
-
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        Inmueble inmueble = inmuebleService.buscarPorId(id);
-        if (inmueble == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         inmuebleService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

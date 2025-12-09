@@ -2,7 +2,10 @@ package com.rpi_bien_de_familia.Entity;
 
 import java.time.LocalDate;
 
+import com.rpi_bien_de_familia.Config.LocalDateToStringConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,9 +36,11 @@ public class ActoInmueble {
     @JoinColumn(name = "id_inmueble", nullable = false)
     private Inmueble inmueble;
 
+    @Convert(converter = LocalDateToStringConverter.class)
     @Column(nullable = false)
     private LocalDate fechaDesde;
 
+    @Convert(converter = LocalDateToStringConverter.class)
     private LocalDate fechaHasta; // null = vigente
 
     @Column(length = 150)

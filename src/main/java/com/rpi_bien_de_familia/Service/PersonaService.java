@@ -68,6 +68,18 @@ public class PersonaService {
 
 	
 	public void eliminar(Long id) {
+		personaRepository.findById(id)
+        .orElseThrow(() -> new ValidacionNegocioException(
+                "La persona que intenta eliminar no existe."
+        ));
+
+		long cantInmuebles = personaInmuebleRepository.countByPersonaId(id);
+		
+		if (cantInmuebles > 0) {
+		    throw new ValidacionNegocioException(
+		        "No se puede eliminar la persona, ya que tiene inmuebles asociados."
+		    );
+		}
 		personaRepository.deleteById(id);
 	}
 }

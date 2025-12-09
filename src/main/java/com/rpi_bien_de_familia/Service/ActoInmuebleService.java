@@ -1,9 +1,13 @@
 package com.rpi_bien_de_familia.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.rpi_bien_de_familia.Dto.BienFamiliaEstadisticaDTO;
 import com.rpi_bien_de_familia.Entity.ActoInmueble;
 import com.rpi_bien_de_familia.Entity.ActoInmueblePersona;
 import com.rpi_bien_de_familia.Entity.PersonaInmueble;
@@ -51,8 +55,20 @@ public class ActoInmuebleService {
     	Long inmuebleId = (Long) actoInmueble.getInmueble().getId();
     	Long actoRegistralId = actoInmueble.getActoRegistral().getId();
     	
-    	if (actoInmuebleRepository.existsByInmuebleIdAndActoRegistralIdAndFechaHastaIsNull(inmuebleId, actoRegistralId)){
-            throw new ValidacionNegocioException("El inmueble ya es un Bien de Familia");
+    	boolean esAlta = actoInmueble.getId() == null;
+
+    	if (esAlta) {
+    	    if (actoInmuebleRepository
+    	            .existsByInmuebleIdAndActoRegistralIdAndFechaHastaIsNull(
+    	                inmuebleId, actoRegistralId)) {
+    	        throw new ValidacionNegocioException("El inmueble ya es un Bien de Familia");
+    	    } 
+    	} else {
+    	    if (actoInmuebleRepository
+    	            .existsByInmuebleIdAndActoRegistralIdAndFechaHastaIsNullAndIdNot(
+    	                inmuebleId, actoRegistralId, actoInmueble.getId())) {
+    	        throw new ValidacionNegocioException("El inmueble ya es un Bien de Familia");
+    	    }
     	}
     	
     	/*Los titulares no pueden tener otro inmueble como bien de familia*/
@@ -90,6 +106,10 @@ public class ActoInmuebleService {
     	return actoInmuebleRepository.save(actoInmueble);
     }
 
+    public List<Object[]> obtenerEstadisticaAnioDepartamento() {
+        return actoInmuebleRepository.obtenerEstadisticaAnioDepartamento();
+    }
+    
     public void eliminar(Long id) {
         actoInmuebleRepository.deleteById(id);
     }
