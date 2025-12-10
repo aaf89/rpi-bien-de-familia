@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Table,
   Button,
@@ -128,16 +129,15 @@ const PersonasPage: React.FC<PersonasPageProps> = ({ onVerInmuebles }) => {
   
     return (
       <div style={{ padding: 24 }}>
-        <h1 style={{ marginBottom: 16 }}>Personas</h1>
+        <h1 style={{ marginBottom: 16 }}>Personas
 
         <Button
           type="primary"
+		  icon={<PlusOutlined />} 
           onClick={abrirModalNuevo}
-          style={{ marginBottom: 16 }}
-        >
-          Nueva Persona
-        </Button>
-
+          style={{ marginBottom: 16, marginLeft: 12 }}
+        />  
+		</h1>
         <Table rowKey="id" dataSource={personas} loading={loading}>
           <Table.Column<PersonaDTO> title="ID" dataIndex="id" />
           <Table.Column<PersonaDTO> title="Cuit/Cuil" dataIndex="cuit" />
@@ -155,6 +155,8 @@ const PersonasPage: React.FC<PersonasPageProps> = ({ onVerInmuebles }) => {
 		  		  render={(_, record) => (
 		  		    <Button
 		  		      size="small"
+					  style={{ backgroundColor: "#e6fffb", borderColor: "#87e8de" }} 
+
 		  		      onClick={() => onVerInmuebles && onVerInmuebles(record.id)}
 		  		    >
 		  				{`Ver Inmuebles (${record.cantInmuebles ?? 0})`}
@@ -166,21 +168,22 @@ const PersonasPage: React.FC<PersonasPageProps> = ({ onVerInmuebles }) => {
             title="Acciones"
             key="acciones"
             render={(_, record) => (
-              <Space>
-                <Button size="small" onClick={() => abrirModalEditar(record)}>
-                  Editar
-                </Button>
-                <Popconfirm
-                  title="¿Eliminar persona?"
-                  description="Esta acción no se puede deshacer."
-                  okText="Sí, eliminar"
-                  cancelText="Cancelar"
-                  onConfirm={() => onEliminar(record)}
-                >
-                  <Button size="small" danger>
-                    Eliminar
-                  </Button>
-                </Popconfirm>
+				<Space>
+				      <Button
+				        type="text"
+				        icon={<EditOutlined />}
+				        onClick={() => abrirModalEditar(record)}
+				      />
+
+				      <Popconfirm
+				        title="¿Eliminar persona?"
+				        description="Esta acción no se puede deshacer."
+				        okText="Sí"
+				        cancelText="No"
+				        onConfirm={() => onEliminar(record)}
+				      >
+				        <Button type="text" danger icon={<DeleteOutlined />} />
+				      </Popconfirm>
               </Space>
             )}
           />

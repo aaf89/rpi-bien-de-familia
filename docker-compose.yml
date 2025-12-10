@@ -1,0 +1,10 @@
+services:
+  backend:
+    build: .
+    container_name: rpi_backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data.db:/app/data/data.db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlite:/app/data/data.db

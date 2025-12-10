@@ -225,12 +225,14 @@ const PersonasInmueblesPage: React.FC<PersonasInmueblesPageProps> = ({
           : "Titularidades (Persona - Inmueble)"}
       </h1>
 
+	  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
       <Button type="primary" onClick={abrirNuevo} style={{ marginBottom: 16 }}>
         Nueva Titularidad
       </Button>
-	  <Button onClick={volver} style={{ marginBottom: 16, marginRight: 8 }}>
+	  <Button type="primary" onClick={volver} style={{ marginBottom: 16 }}>
 	         Volver
-	       </Button>
+	  </Button>
+	  </div>
 
       <Table<PI> dataSource={items} loading={loading} rowKey="id">
         <Table.Column<PI> title="ID" dataIndex="id" />

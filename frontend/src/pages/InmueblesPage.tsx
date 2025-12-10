@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Table,
   Button,
@@ -187,15 +188,15 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ marginBottom: 16 }}>Inmuebles</h1>
+      <h1 style={{ marginBottom: 16 }}>Inmuebles
 
       <Button
         type="primary"
+		icon={<PlusOutlined />} 
         onClick={abrirModalNuevo}
-        style={{ marginBottom: 16 }}
-      >
-        Nuevo inmueble
-      </Button>
+        style={{ marginBottom: 16 , marginLeft: 12}}
+      />
+      </h1>   
 
       <Table rowKey="id" dataSource={inmuebles} loading={loading}>
         <Table.Column<InmuebleDTO> title="ID" dataIndex="id" />
@@ -220,6 +221,7 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({
           render={(_, record) => (
             <Button
               size="small"
+			  style={{ backgroundColor: "#e6fffb", borderColor: "#87e8de" }} 
               onClick={() => onVerTitulares && onVerTitulares(record.id)}
             >
               {`Ver Titulares (${record.cantTitulares ?? 0})`}
@@ -233,6 +235,7 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({
           render={(_, record) => (
             <Button
               size="small"
+			  style={{ backgroundColor: "#e6fffb", borderColor: "#87e8de" }} 
               onClick={() =>
                 onVerBienDeFamilia && onVerBienDeFamilia(record.id)
               }
@@ -250,9 +253,11 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({
           key="acciones"
           render={(_, record) => (
             <Space>
-              <Button size="small" onClick={() => abrirModalEditar(record)}>
-                Editar
-              </Button>
+              <Button 
+			    type="text"
+			  	icon={<EditOutlined />}
+			    onClick={() => abrirModalEditar(record)}
+				/>
               <Popconfirm
                 title="¿Eliminar inmueble?"
                 description="Esta acción no se puede deshacer."
@@ -260,9 +265,8 @@ const InmueblesPage: React.FC<InmueblesPageProps> = ({
                 cancelText="Cancelar"
                 onConfirm={() => onEliminar(record)}
               >
-                <Button size="small" danger>
-                  Eliminar
-                </Button>
+			  <Button type="text" danger icon={<DeleteOutlined />} />
+
               </Popconfirm>
             </Space>
           )}

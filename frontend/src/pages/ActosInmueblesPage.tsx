@@ -173,13 +173,14 @@ const ActosInmueblesPage : React.FC<ActosInmueblesPageProps> = ({
     <div style={{ padding: 24 }}>
       <h1>Actos Registrales por Inmueble</h1>
 
+	  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
       <Button type="primary" onClick={abrirNuevo} style={{ marginBottom: 16 }}>
         Nuevo Acto en Inmueble
       </Button>
-	  <Button onClick={volver} style={{ marginBottom: 16, marginRight: 8 }}>
+	  <Button type="primary" onClick={volver} style={{ marginBottom: 16, marginRight: 8 }}>
 	 	Volver
 	  </Button>
-
+	  </div>
       <Table dataSource={items} loading={loading} rowKey="id">
         <Table.Column title="Acto" render={(_, r) => r.actoRegistral.descripcion} />
         <Table.Column title="Inmueble" render={(_, r) => r.inmueble.matricula} />
